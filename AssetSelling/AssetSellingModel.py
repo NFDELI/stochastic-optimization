@@ -4,7 +4,6 @@ sys.path.append("../")
 from BaseClasses.SDPModel import SDPModel
 import pandas as pd
 
-
 class AssetSellingModel(SDPModel):
     def __init__(
         self,
