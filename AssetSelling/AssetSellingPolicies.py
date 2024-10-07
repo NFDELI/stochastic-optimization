@@ -55,4 +55,3 @@ class TrackPolicy(SDPPolicy):
         if t == T - 1:
             new_decision = {"sell": 1, "hold": 0}
         return new_decision
-print("hello")
