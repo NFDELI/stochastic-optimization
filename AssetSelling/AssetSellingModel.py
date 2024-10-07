@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append("../")
+sys.path.append("./")
 from BaseClasses.SDPModel import SDPModel
 import pandas as pd
 
@@ -121,3 +121,4 @@ class AssetSellingModelHistorical(AssetSellingModel):
 
     def exog_info_fn(self, decision):
         return {"price": self.episode_data.pop(0), "bias": "Neutral"}
+    

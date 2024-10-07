@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append("../")
+sys.path.append("./")
 from BaseClasses.SDPModel import SDPModel
 from BaseClasses.SDPPolicy import SDPPolicy
 
@@ -55,3 +55,4 @@ class TrackPolicy(SDPPolicy):
         if t == T - 1:
             new_decision = {"sell": 1, "hold": 0}
         return new_decision
+print("hello")
