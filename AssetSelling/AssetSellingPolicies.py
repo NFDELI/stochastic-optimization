@@ -33,6 +33,7 @@ class HighLowPolicy(SDPPolicy):
             else {"sell": 0, "hold": 1}
         )
 
+        # When time has reached, return a decision.
         if t == T - 1:
             new_decision = {"sell": 1, "hold": 0}
 
