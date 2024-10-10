@@ -67,6 +67,7 @@ class SDPPolicy(ABC):
                 results_dict = {"N": i, "t": model_copy.t, "C_t sum": model_copy.objective}
 
                 #'._asdict()' converts the 'state_t', a tuple, into a dictionary with the keys are the field names of the name tuples and their values be the tuple's values.
+                #'.update()' adds/updates/merges the keys and values from another dictionary.
                 results_dict.update(state_t._asdict())
                 results_dict.update(decision_t._asdict())
 
@@ -78,7 +79,7 @@ class SDPPolicy(ABC):
                 state_t_plus_1 = model_copy.step(decision_t)
             # Model is reset afrer each while-loop iteration
 
-            # 'N' [iteration] keeps trac of how many times the policy has been run.
+            # 'N' [iteration] keeps track of how many times the policy has been run.
             # 'C_t_sum' [Cumulative Objective] represents a perfomance metric that accumulates over time.
             # each 'results_dict' stores different metrics at different times of t.
             results_dict = {"N": i, "t": model_copy.t, "C_t sum": model_copy.objective}
@@ -105,8 +106,11 @@ class SDPPolicy(ABC):
             result_list.append(results_dict)
 
         # Logging
+        # Create a Panda Frame based on 'result_list'
         self.results = pd.DataFrame.from_dict(result_list)
+
         # t_end per iteration
+        # Creates a new column 't_end'
         # t_end will get the largest 't' value of each N iteration. (makes it easier to track end of t)
         self.results["t_end"] = self.results.groupby("N")["t"].transform("max")
 
