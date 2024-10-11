@@ -6,11 +6,13 @@ import pandas as pd
 
 class AssetSellingModel(SDPModel):
     def __init__(
+        # The values alpha, variance, bias... is know by RESEARCH!! (Literature review, historical data)
         self,
         S0: dict,
         t0: float = 0,
         T: float = 1,
         seed: int = 42,
+        # A parameter that may control some aspect of the model, possibly a weighting factor.
         alpha: float = 0.7,
         var: float = 2,
         bias_df: pd.DataFrame = None,
@@ -19,6 +21,7 @@ class AssetSellingModel(SDPModel):
     ) -> None:
         state_names = ["price", "bias", "price_smoothed", "resource"]
 
+        # A smoothed version of the price, perhaps to reduce volatility.
         # Set default values for helper states
         if "bias" not in S0:
             S0["bias"] = "Neutral"
@@ -53,6 +56,8 @@ class AssetSellingModel(SDPModel):
         return super().is_finished() or not hold_asset
 
     def exog_info_fn(self, decision):
+
+        # ASSUMPTIONS can be made, as seen from the comments below.
         """
         Generates exogenous information for the asset selling model.
 
@@ -69,6 +74,7 @@ class AssetSellingModel(SDPModel):
         """
         biasprob = self.bias_df[self.state.bias]
 
+        # Remember .prng is a random number generator.
         coin = self.prng.uniform()
         if coin < biasprob["Up"]:
             new_bias = "Up"
@@ -80,8 +86,11 @@ class AssetSellingModel(SDPModel):
             new_bias = "Down"
             bias = self.downstep
 
+        # 'delta' means the change in something... i.e price!
         price_delta = self.prng.normal(bias, self.var)
         updated_price = self.state.price + price_delta
+
+        # Prevents 'new_price' from going negative.
         new_price = 0.0 if updated_price < 0.0 else updated_price
 
         return {
@@ -89,6 +98,7 @@ class AssetSellingModel(SDPModel):
             "bias": new_bias,
         }
 
+    # Remember that transition functions determines how you move from one state to another.
     def transition_fn(self, decision, exog_info):
         alpha = self.alpha
         new_resource = 0 if decision.sell == 1 else self.state.resource
@@ -96,6 +106,7 @@ class AssetSellingModel(SDPModel):
 
         return {"resource": new_resource, "price_smoothed": new_price_smoothed}
 
+    # Remember that objective function is to determine the performance of each iteration. 
     def objective_fn(self, decision, exog_info):
         sell_size = 1 if decision.sell == 1 and self.state.resource != 0 else 0
         return self.state.price * sell_size
@@ -114,11 +125,15 @@ class AssetSellingModelHistorical(AssetSellingModel):
     def reset(self, reset_prng: bool = False):
         # Get the subset of the historical data that corresponds to the current episode
         self.episode_data = self.hist_data.loc[self.hist_data["N"] == self.episode_counter, :]
+
+        # What is toList?
         self.episode_data = self.episode_data["price"].tolist()
         self.episode_data.pop(0)
         self.T = len(self.episode_data)
         super().reset(reset_prng)
 
     def exog_info_fn(self, decision):
+        # Why is it made this way?
+        # Maybe data frame is like a stack!!
         return {"price": self.episode_data.pop(0), "bias": "Neutral"}
     
