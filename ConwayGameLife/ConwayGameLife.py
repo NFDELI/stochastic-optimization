@@ -8,11 +8,12 @@ import ConwayGameLifePolicy as cgp
 from BaseClasses import Util as util
 
 # Example Usage
-grid_size = 10
-T = 10
+grid_size = 50
+T = 30
 model = cgm.ConwayGameLife(grid_size = grid_size, t0=0, T=T)
 
 policy = cgp.ConwayGameOfLifePolicy(model = model)
+#policy = cgp.FixedConwayGameOfLifePolicy(model = model)
 
 number_of_iterations = 1
 policy.run_policy(n_iterations = number_of_iterations)
